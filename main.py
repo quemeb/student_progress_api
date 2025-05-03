@@ -8,6 +8,19 @@ load_dotenv()
 
 app = FastAPI()
 
+# ✅ Allow only your frontend to access the API
+origins = [
+    "https://student-progress-frontend.onrender.com"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 @app.get("/")
