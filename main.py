@@ -15,16 +15,16 @@ def read_root():
     return {"message": "API is running."}
 
 @app.get("/get_student_progress")
-def get_student_progress(email: str):
+def get_student_progress(email: str, student_id: str):
 
     conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor()
 
     query = """
         SELECT * FROM student_progress_view
-        WHERE calbright_email = %s
+        WHERE calbright_email = %s AND ccc_id = %s
     """
-    cur.execute(query, (email,))
+    cur.execute(query, (email, student_id))
     row = cur.fetchone()
 
     columns = [desc[0] for desc in cur.description] if row else []
@@ -34,4 +34,4 @@ def get_student_progress(email: str):
     if row:
         return dict(zip(columns, row))
     else:
-        return {"message": "Student not found."}
+        return {"message": "Student not found or ID does not match."}
