@@ -30,21 +30,22 @@ def read_root():
 
 @app.get("/get_student_progress")
 def get_student_progress(email: str, student_id: str):
-    try:
-        conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor()
-        query = """
-            SELECT * FROM student_progress_view
-            WHERE calbright_email = %s AND ccc_id = %s
-        """
-        cur.execute(query, (email, student_id))
-        row = cur.fetchone()
-        columns = [desc[0] for desc in cur.description] if row else []
-        cur.close()
-        conn.close()
-        return dict(zip(columns, row)) if row else {"message": "Student not found or ID does not match."}
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return {"error": str(e)}
 
+    conn = psycopg2.connect(DATABASE_URL)
+    cur = conn.cursor()
+
+    query = """
+        SELECT * FROM student_progress_view
+        WHERE calbright_email = %s AND ccc_id = %s
+    """
+    cur.execute(query, (email, student_id))
+    row = cur.fetchone()
+
+    columns = [desc[0] for desc in cur.description] if row else []
+    cur.close()
+    conn.close()
+
+    if row:
+        return dict(zip(columns, row))
+    else:
+        return {"message": "Student not found or ID does not match."}
